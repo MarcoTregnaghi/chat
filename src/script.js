@@ -3,23 +3,19 @@ var name = ""
 var n;
 var to = "";
 
+$("body").on("click", ".chatLi", function (el) {
+    //    $("#chatLi").css("background-color", "gray");
+    to = $(el.target).text();
+});
 
 $('form').submit(function () {
-    socket.emit('chat message', [name, $('#m').val(), n]);
+    if (to != "") {
+        socket.emit('chat message', [name, $('#m').val(), to]);
+        $('#messages').append($('<li>').text("@you >>> " + $('#m').val()));
+    }
     $('#m').val('');
     return false;
 });
-
-$("li").click(function () {
-    alert("ok")
-    //    $("#chatLi").css("background-color", "gray");
-    to="";
-})
-$("li").on("click", function () {
-    alert("ok")
-    //    $("#chatLi").css("background-color", "gray");
-    to="";
-})
 
 socket.on("getN", function (number) {
     n = number;
@@ -35,7 +31,7 @@ socket.on('login', function (msg) {
         for (var i = 0; i < msg[1].length; i++) {
             console.log("added " + msg[1][i]["name"])
         }
-    }else{
+    } else {
         alert("name already present")
     }
 
@@ -53,21 +49,18 @@ socket.on('login', function (msg) {
         $('#chatList').empty();
         for (var i = 0; i < msg.length; i++) {
             if (msg[i]["name"] != name && msg[i]["name"] != "") {
-                $('#chatList').append($('<li id = "chatLi">').text(msg[i]["name"]))
+                $('#chatList').append($("<li class='chatLi'>").text(msg[i]["name"]))
             }
+
         }
-        $("#chatLi").click(function () {
-            alert("ok")
-            //    $("#chatLi").css("background-color", "gray");
-            to="";
-        })
+
     });
 
 
 })
 
 $("#regBtn").on('click', function () {
-    
+
     socket.emit('registration', [$("#input").val(), n]);
 })
 

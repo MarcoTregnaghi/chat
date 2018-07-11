@@ -22,7 +22,7 @@
     form {
       background: lightsteelblue;
       padding: 3px;
-      width:100%;
+      width: 100%;
     }
 
     form input {
@@ -78,14 +78,15 @@
       display: none;
       height: 100%;
       width: 60%;
-
+      overflow: scroll;
       line-height: 75px;
       font-size: 18px;
       border: 2px solid darkcyan;
     }
 
-    #chatLi {
+    .chatLi {
       background-color: lightblue;
+      border: 1px solid white;
       font-size: 13px;
     }
 
@@ -96,28 +97,36 @@
     }
 
     #title {
-      width: 50%;
-      height: 100%;
+      width: 40%;
+      height: 50%;
+      left: 0px;
+      top: 40%;
     }
 
     #mainChat {
-      
+
       top: 15%;
       height: 90%;
-      width:100%;
+      width: 100%;
       padding: 10px;
     }
 
-    #mainSend{
+    #mainSend {
       display: none;
-      height: 20%;
-      width:100%;
-      bottom:0%;
+      height: 5%;
+      width: 100%;
+      bottom: 0%;
     }
 
-    .main{
+    .main {
       height: 100%;
       width: 100%;
+    }
+
+    #mainInput {
+      right: 20%;
+      height: 50%;
+      top: 20%;
     }
   </style>
   <link href=".\style.css">
@@ -125,13 +134,13 @@
 </head>
 
 <body>
-  <div id="container-fluid" class ="main">
+  <div id="container-fluid" class="main">
     <div class="flex-container" id="titleContainer">
       <div id="title">
         <span>Chat</span>
       </div>
 
-      <div>
+      <div id="mainInput">
         <input type="text" id="input">
         <button id="regBtn">connect</button>
       </div>
@@ -148,7 +157,7 @@
 
     </div>
 
-    <div class="flex-container" id ="mainSend">
+    <div class="flex-container" id="mainSend">
       <form action="">
         <input id="m" autocomplete="off" />
         <button>Send</button>

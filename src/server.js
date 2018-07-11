@@ -16,10 +16,9 @@ app.get('/script.js', function (req, res) {
 });
 
 io.on('connection', function (socket) {
-  var position = lastClient;
   io.sockets.connected[socket.id].emit("getN", lastClient); 
   lastClient++;
-  clients.push({ "id": socket.id, "name": "" })
+  clients.push({ "id": socket.id, "name": "" , chats: []})
   
   console.log('[INFO] user connected');
 
@@ -32,13 +31,10 @@ io.on('connection', function (socket) {
      
       for (var i = 0; i < clients.length; i++) {
           io.sockets.connected[clients[i]["id"]].emit('user logged', clients);
-        
       }
-
-
       socket.on('chat message', function (data) { // list name, msg
         for (var i = 0; i < clients.length; i++) {
-          if (data[0] != clients[i]["name"]) {
+          if (data[2] == clients[i]["name"]) {
             io.sockets.connected[clients[i]["id"]].emit('chat message', data);
           }
         }
