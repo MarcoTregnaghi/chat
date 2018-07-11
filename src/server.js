@@ -1,8 +1,8 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var port = 3000;
 var $ = require('jquery');
+var port = 3000;
 var lastClient = 0;
 var clients = [];
 
@@ -19,16 +19,21 @@ io.on('connection', function (socket) {
   var position = lastClient;
   io.sockets.connected[socket.id].emit("getN", lastClient); 
   lastClient++;
-
   clients.push({ "id": socket.id, "name": "" })
+  
   console.log('[INFO] user connected');
 
   socket.on('registration', function (reqName) {
     if (checkClients(reqName[0], clients)) {
+      clients[reqName[1]]["name"] = reqName[0];
       console.log("[INFO] account confirmed: " + reqName[0])
 
-      clients[reqName[1]]["name"] = reqName[0];
       io.sockets.connected[clients[reqName[1]]["id"]].emit("login", ["done", clients]); // messaggio mirato (id)
+     
+      for (var i = 0; i < clients.length; i++) {
+          io.sockets.connected[clients[i]["id"]].emit('user logged', clients);
+        
+      }
 
 
       socket.on('chat message', function (data) { // list name, msg
@@ -40,19 +45,25 @@ io.on('connection', function (socket) {
       });
     } else {
       console.log("[ERROR] the name already exist: " + reqName[0])
-      io.sockets.connected[clients[position]["id"]].emit("login", [-1, "fail"]);
+      io.sockets.connected[clients[reqName[1]]["id"]].emit("login", [-1, "fail"]);
     }
 
 
   });
 
   socket.on('disconnect', function () {
+    console.log("[INFO] user disconnected")
     for (var i = 0; i < clients.length; i++) {
       if (clients[i]["id"] == socket.id) {
         clients.splice(i, 1);
       }
     }
     lastClient--;
+
+    for (var i = 0; i < clients.length; i++) {
+      io.sockets.connected[clients[i]["id"]].emit('user logged', clients);
+    
+  }
   });
 }
 );
@@ -67,7 +78,6 @@ function checkClients(name, clients) {
   for (var i = 0; i < clients.length; i++) {
     arr.push(clients[i]["name"])
   }
-  console.log(arr, clients)
 
   if (arr.indexOf(name) > -1) {
     return false
