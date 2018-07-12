@@ -4,7 +4,7 @@ var n;
 var to = "";
 
 $("body").on("click", ".chatLi", function (el) {
-    //    $("#chatLi").css("background-color", "gray");
+    // TODO Cambiare colore li una volta cliccato.
     to = $(el.target).text();
     socket.emit('chat-request', [name, to]);
 });
@@ -20,7 +20,7 @@ $('form').submit(function () {
 
 socket.on("getN", function (number) {
     n = number;
-})
+});
 
 socket.on('login', function (msg) {
     if (msg[0] == "done") {
@@ -64,7 +64,7 @@ socket.on('login', function (msg) {
     });
 
 
-})
+});
 
 $("#regBtn").on('click', function () {
 

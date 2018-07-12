@@ -1,11 +1,11 @@
-var app = require('express')();
-var http = require('http').Server(app);
+var app = require("express")();
+var http = require("http").Server(app);
 var io = require('socket.io')(http);
 var $ = require('jquery');
 var port = 3000;
 var lastClient = 0;
 var clients = [];
-var chats = []
+var chats = [];
 
 
 app.get('/', function (req, res) {
@@ -57,7 +57,6 @@ io.on('connection', function (socket) {
         }
         for (var i = 0; i < chats.length; i++) {
           if (data[0] == chats[i]["name"]) {
-            
             chats[i]["name"] //TODO chat 
 
             found = true;
