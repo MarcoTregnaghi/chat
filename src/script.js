@@ -6,6 +6,7 @@ var to = "";
 $("body").on("click", ".chatLi", function (el) {
     //    $("#chatLi").css("background-color", "gray");
     to = $(el.target).text();
+    socket.emit('chat-request', [name, to]);
 });
 
 $('form').submit(function () {
@@ -28,17 +29,22 @@ socket.on('login', function (msg) {
         $("#mainSend").show();
         name = $("#input").val();
         alert("done")
-        for (var i = 0; i < msg[1].length; i++) {
-            console.log("added " + msg[1][i]["name"])
-        }
+        
     } else {
         alert("name already present")
     }
 
-    socket.on('chat message', function (msg) { // TODO Ciclo for socket eliminare operatore ternario.
+    socket.on('chat message', function (msg) {
         $('#messages').append($('<li>').text("@" + msg[0] + ">>> " + msg[1]))
         window.scrollTo(0, document.body.scrollHeight);
 
+    });
+    socket.on('chat-list', function (msg) {
+        for (var i = 0; i < msg.length; i++) {
+            $('#chatList').append($("<li class='chatLi'>").text(msg[i]))
+            
+        }
+        console.log(msg)
     });
     socket.on("reg", function (msg) {
         $('#messages').append($('<li>').text(msg));

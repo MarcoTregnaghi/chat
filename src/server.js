@@ -5,6 +5,7 @@ var $ = require('jquery');
 var port = 3000;
 var lastClient = 0;
 var clients = [];
+var chats = []
 
 
 app.get('/', function (req, res) {
@@ -16,10 +17,10 @@ app.get('/script.js', function (req, res) {
 });
 
 io.on('connection', function (socket) {
-  io.sockets.connected[socket.id].emit("getN", lastClient); 
+  io.sockets.connected[socket.id].emit("getN", lastClient);
   lastClient++;
-  clients.push({ "id": socket.id, "name": "" , chats: []})
-  
+  clients.push({ "id": socket.id, "name": "" })
+
   console.log('[INFO] user connected');
 
   socket.on('registration', function (reqName) {
@@ -28,15 +29,43 @@ io.on('connection', function (socket) {
       console.log("[INFO] account confirmed: " + reqName[0])
 
       io.sockets.connected[clients[reqName[1]]["id"]].emit("login", ["done", clients]); // messaggio mirato (id)
-     
+
       for (var i = 0; i < clients.length; i++) {
-          io.sockets.connected[clients[i]["id"]].emit('user logged', clients);
+        io.sockets.connected[clients[i]["id"]].emit('user logged', clients);
       }
+      socket.on('chat-request', function (data) {
+        for (var i = 0; i < clients.length; i++) {
+          if (data[0] == clients[i]["name"]) {
+            for (var i = 0; i < chats.length; i++) {
+              if (data[0] == chats[i]["name"]) {
+                console.log("sended " + chats[i]["chats"][data[1]])
+                io.sockets.connected[clients[i]["id"]].emit('chat-list', chats[i]["chats"][data[1]]);
+              }
+            }
+          }
+        }
+      });
       socket.on('chat message', function (data) { // list name, msg
+        found = false;
         for (var i = 0; i < clients.length; i++) {
           if (data[2] == clients[i]["name"]) {
             io.sockets.connected[clients[i]["id"]].emit('chat message', data);
           }
+        }
+        for (var i = 0; i < chats.length; i++) {
+          if (data[0] == chats[i]["name"]) {
+            chats[i]["chats"][data[2]].push(data[1]);
+            found = true;
+          }
+        }
+        if (!found) {
+          var a = data[2].toString();
+          chats.push({
+            "name": data[0], "chats": [
+              
+            ]
+          });
+          chats.length == 0 ? chats[0]["chats"][data[2]].push(data[1]) : chats[chats.length -1]["chats"].push({data[1]}); //data[2]
         }
       });
     } else {
@@ -58,8 +87,8 @@ io.on('connection', function (socket) {
 
     for (var i = 0; i < clients.length; i++) {
       io.sockets.connected[clients[i]["id"]].emit('user logged', clients);
-    
-  }
+
+    }
   });
 }
 );
