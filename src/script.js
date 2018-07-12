@@ -40,6 +40,7 @@ socket.on('login', function (msg) {
 
     });
     socket.on('chat-list', function (msg) {
+        alert(msg);
         for (var i = 0; i < msg.length; i++) {
             $('#chatList').append($("<li class='chatLi'>").text(msg[i]))
             

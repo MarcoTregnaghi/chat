@@ -34,12 +34,14 @@ io.on('connection', function (socket) {
         io.sockets.connected[clients[i]["id"]].emit('user logged', clients);
       }
       socket.on('chat-request', function (data) {
+        console.log("chat request")
         for (var i = 0; i < clients.length; i++) {
           if (data[0] == clients[i]["name"]) {
-            for (var i = 0; i < chats.length; i++) {
-              if (data[0] == chats[i]["name"]) {
-                console.log("sended " + chats[i]["chats"][data[1]])
-                io.sockets.connected[clients[i]["id"]].emit('chat-list', chats[i]["chats"][data[1]]);
+            console.log(clients[i]["name"])
+            for (var g = 0; g < chats.length; g++) {
+              if (data[0] == chats[g]["name"]) {
+                console.log("sended " + chats[g]["name"])
+                io.sockets.connected[clients[g]["id"]].emit('chat-list', chats[g]["chats"][data[1]]);
               }
             }
           }
@@ -49,24 +51,31 @@ io.on('connection', function (socket) {
         found = false;
         for (var i = 0; i < clients.length; i++) {
           if (data[2] == clients[i]["name"]) {
+            console.log("ok")
             io.sockets.connected[clients[i]["id"]].emit('chat message', data);
           }
         }
         for (var i = 0; i < chats.length; i++) {
           if (data[0] == chats[i]["name"]) {
-            chats[i]["chats"][data[2]].push(data[1]);
+            
+            chats[i]["name"] //TODO chat 
+
             found = true;
           }
         }
         if (!found) {
-          var a = data[2].toString();
+          var nm = data[0].toString();
+          var ms = data[1].toString();
+          var to = data[2].toString();
           chats.push({
-            "name": data[0], "chats": [
-              
+            nm: [    // TODO Finire definizione struttura oggetto Chats     
             ]
           });
-          chats.length == 0 ? chats[0]["chats"][data[2]].push(data[1]) : chats[chats.length -1]["chats"].push({data[1]}); //data[2]
+          a = data[1].toString();
+          chats[chats.length-1][nm].push({to: [a]})
+        
         }
+        console.log();
       });
     } else {
       console.log("[ERROR] the name already exist: " + reqName[0])
