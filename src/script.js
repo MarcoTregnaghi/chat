@@ -41,9 +41,12 @@ socket.on('login', function (msg) {
     });
     socket.on('chat-list', function (msg) {
         alert(msg);
-        for (var i = 0; i < msg.length; i++) {
-            $('#chatList').append($("<li class='chatLi'>").text(msg[i]))
-            
+        for (var i = 0; i < msg[0].length; i++) {
+            if(msg[1][i]){
+                $('#chatList').append($("<li class='chatLi'>").text("@you>>> " + msg[0][i]))
+            }else{
+                $('#chatList').append($("<li class='chatLi'>").text("@" + to + ">>> " + msg[0][i]))
+            }
         }
         console.log(msg)
     });
