@@ -35,19 +35,23 @@ io.on('connection', function (socket) {
       }
       socket.on('chat-request', function (data) {
         console.log("chat request")
-        rfrom = data[0];
-        rfrnd = data[1];
-        if (data[rfrom] != undefined) {
-          if (data[rfrom].indexOf(Object.keys(chats)) < 0) {
-            for (var i = 0; i < clients.length; i++) {
-              if (data[rfrom] == clients[i]["name"]) {
-                console.log("ok")
-                chat = chats[rfrom][rfrnd];
-                v = chats[rfrom]["from"];
-                io.sockets.connected[clients[i]["id"]].emit('chat-list', [chat, v]);
-              }
+        rfrom = data[0].toString();
+        rfrnd = data[1].toString();
+
+        if (chats[rfrom] != undefined) {
+          console.log(chats[rfrom])
+          for (var i = 0; i < chats[rfrom].length; i++) {
+            var array = Object.keys(chats[rfrom][i])
+
+            if (array.indexOf(rfrnd) > -1) {
+              chat = chats[rfrom][i][rfrnd];
+              v = chats[rfrom][i]["from"];
+              console.log("sended chat list")
+              io.sockets.connected[socket.id].emit('chat-list', [chat, v, chats]);
             }
           }
+        }else{
+          io.sockets.connected[socket.id].emit('chat-list', [[], [], []]);
         }
 
       });
@@ -59,28 +63,67 @@ io.on('connection', function (socket) {
             io.sockets.connected[clients[i]["id"]].emit('chat message', data);
           }
         }
-        sender = data[0];
-        if (data[2].indexOf(Object.keys(chats)) < 0) { // Ricevente
-          chats[data[2]] = { sender: [], "from": [] };
-          console.log(chats[data[2]])
-          //chats[data[2]][sender].push(data[1]);
-          chats[data[2]]["from"].push(0);
-        } else {
-          chats[data[2]][sender].push(data[1]);
-          chats[data[2]]["from"].push(0);
-        }
+
+        // ************Salvataggio messaggio************
         sender = data[2];
-        if (data[0].indexOf(Object.keys(chats)) < 0) { // Mittente
-
-          chats[data[0]] = { sender: [], "from": [] }
-          //chats[data[0]][sender].push(data[1]);
-          chats[data[0]]["from"].push(1);
+        receiver = data[0];
+        testarrkey = Object.keys(chats)
+        boo = true
+        if (testarrkey.indexOf(sender) < 0) { // Ricevente
+          chats[sender] = []
+          chats[sender].push({})
+          chats[sender][chats[sender].length - 1][receiver] = [];
+          chats[sender][chats[sender].length - 1][receiver].push(data[1])
+          chats[sender][chats[sender].length - 1]["from"] = [];
+          chats[sender][chats[sender].length - 1]["from"].push(0)
         } else {
-          chats[data[0]][sender].push(data[1]);
-          chats[data[0]]["from"].push(1);
+          for (var i = 0; i < chats[sender].length; i++) {
+            var kk = Object.keys(chats[sender][i]);
+            if (kk.indexOf(receiver) > -1) {
+              // aggiungo il messaggio
+              chats[sender][i][receiver].push(data[1])
+              chats[sender][i]["from"].push(0)
+              boo = false;
+            }
+          }
+          if (boo) {
+            // creo la lista
+            chats[sender].push({});
+            chats[sender][chats[sender].length - 1][receiver] = [];
+            chats[sender][chats[sender].length - 1][receiver].push(data[1])
+            chats[sender][chats[sender].length - 1]["from"] = []
+            chats[sender][chats[sender].length - 1]["from"].push(0)
+          }
         }
 
-
+        boo = true
+        if (testarrkey.indexOf(receiver) < 0) { // Mittente
+          chats[receiver] = []
+          chats[receiver].push({})
+          chats[receiver][chats[receiver].length - 1][sender] = [];
+          chats[receiver][chats[receiver].length - 1][sender].push(data[1])
+          chats[receiver][chats[receiver].length - 1]["from"] = [];
+          chats[receiver][chats[receiver].length - 1]["from"].push(1)
+        } else {
+          for (var i = 0; i < chats[receiver].length; i++) {
+            var kk = Object.keys(chats[receiver][i]);
+            if (kk.indexOf(sender) > -1) {
+              // aggiungo il messaggio
+              chats[receiver][i][sender].push(data[1])
+              chats[receiver][i]["from"].push(1)
+              boo = false;
+            }
+          }
+          if (boo) {
+            // creo la lista
+            chats[receiver].push({});
+            chats[receiver][chats[receiver].length - 1][sender] = [];
+            chats[receiver][chats[receiver].length - 1][sender].push(data[1])
+            chats[receiver][chats[receiver].length - 1]["from"] = []
+            chats[receiver][chats[receiver].length - 1]["from"].push(1)
+          }
+        }
+        // *********************************************
       });
     } else {
 
