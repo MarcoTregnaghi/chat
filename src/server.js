@@ -70,20 +70,13 @@ io.on('connection', function (socket) {
       io.sockets.connected[clients[reqName[1]]["id"]].emit("login", ["done", clients]); // messaggio mirato (id)
 
       for (var i = 0; i < clients.length; i++) {
-        
         io.sockets.connected[clients[i]["id"]].emit('user logged', clients);
       }
 
       socket.on('search request', function(data){
-
         var ret = filterOnlineClient(data[0], data[1]);
-
         io.sockets.connected[socket.id].emit('search response', ret);
-
       });
-
-      
-
 
       socket.on('chat-request', function (data) {
         var currentdate = new Date();
@@ -157,6 +150,7 @@ io.on('connection', function (socket) {
         }
 
         boo = true
+
         if (testarrkey.indexOf(receiver) < 0) { // Mittente
           chats[receiver] = []
           chats[receiver].push({})
@@ -186,7 +180,6 @@ io.on('connection', function (socket) {
         // *********************************************
       });
     } else {
-
       console.log("[ERROR] the name already exist: " + reqName[0])
       io.sockets.connected[clients[reqName[1]]["id"]].emit("login", [-1, "fail"]);
     }
@@ -211,7 +204,6 @@ io.on('connection', function (socket) {
       }
     }
     lastClient--;
-
     for (var i = 0; i < clients.length; i++) {
       io.sockets.connected[clients[i]["id"]].emit('user logged', clients);
     }
@@ -265,9 +257,9 @@ function checkClients(name, clients) {
 //       }
 //   }
 // }
+
 function filterOnlineClient(valore, from){
   var input, filter, ul, li, a, i;
-
   filter = valore.toUpperCase();
   var array=[];
 
@@ -278,17 +270,12 @@ function filterOnlineClient(valore, from){
 
   var match=[]
 
-
   for (i = 0; i < registeredClients.length; i++) {
-      
       var val = registeredClients[i].toUpperCase()
-      
+
       if (val.includes(filter) && valore !== "" && from.toUpperCase() != val) {
           match.push(registeredClients[i]);
       }
-
-
   }
-
   return match;
 }
