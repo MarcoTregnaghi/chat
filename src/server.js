@@ -8,12 +8,29 @@ var clients = [];
 var chats = {};
 
 
+class Client {
+
+  constructor(id, name){
+    this.id = id;
+    this.name = name;
+    this.chat = {};
+  }
+
+}
+
+
+
+
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
 });
 
 app.get('/script.js', function (req, res) {
   res.sendFile(__dirname + '/script.js');
+});
+
+app.get('/mainBG.png', function (req, res) {
+  res.sendFile(__dirname + '/mainBG.png');
 });
 
 io.on('connection', function (socket) {
@@ -28,13 +45,15 @@ io.on('connection', function (socket) {
       clients[reqName[1]]["name"] = reqName[0];
       console.log("[INFO] account confirmed: " + reqName[0])
 
+      reqName[0]  = new Client(socket.id, reqName[0]);
+
       io.sockets.connected[clients[reqName[1]]["id"]].emit("login", ["done", clients]); // messaggio mirato (id)
 
       for (var i = 0; i < clients.length; i++) {
         io.sockets.connected[clients[i]["id"]].emit('user logged', clients);
       }
       socket.on('chat-request', function (data) {
-        console.log("chat request")
+        console.log("[INFO] chat request from " + data[0])
         rfrom = data[0].toString();
         rfrnd = data[1].toString();
 
@@ -55,11 +74,11 @@ io.on('connection', function (socket) {
         }
 
       });
+
       socket.on('chat message', function (data) { // list name, msg
         found = false;
         for (var i = 0; i < clients.length; i++) {
           if (data[2] == clients[i]["name"]) {
-            console.log("ok")
             io.sockets.connected[clients[i]["id"]].emit('chat message', data);
           }
         }
@@ -145,7 +164,6 @@ io.on('connection', function (socket) {
 
     for (var i = 0; i < clients.length; i++) {
       io.sockets.connected[clients[i]["id"]].emit('user logged', clients);
-
     }
   });
 }
@@ -169,3 +187,5 @@ function checkClients(name, clients) {
   }
 
 }
+
+
