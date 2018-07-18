@@ -8,8 +8,9 @@ var n;
 var to = "";
 
 function friendHtmlBuilder(name) {
-    return "<li class = 'friendSectionLi'>" + name +  "<button type='button' class='btn btn-primary btn-sm' >Start Chat</button>   <button type='button' class='btn btn-primary btn-sm'>Remove Friend</button></li>";
+    return "<li class = 'friendSectionLi'>" + name + "                 <button type='button' class='btn btn-primary btn-sm' >Start Chat</button>   <button type='button' class='btn btn-primary btn-sm'>Remove Friend</button></li>";
 }
+
 // var h = $("body").css('height');
 // var w = $("body").css('width');
 
@@ -40,13 +41,12 @@ $("body").on("click", [".chatLi", ".chatLiNotified"], function (el) {
     }
 });
 
-$('form').submit(function () {
-
+$('#formId').submit(function () {
     if (to != "") {
-        socket.emit('chat message', [name, $('#m').val(), to]);
-        $('#messages').append($('<li>').text("@you >>> " + $('#m').val()));
+        socket.emit('chat message', [name, $('#sendMessageBtn').val(), to]);
+        $('#messages').append($('<li>').text("@you >>> " + $('#sendMessageBtn').val()));
     }
-    $('#m').val('');
+    $('#sendMessageBtn').val('');
     return false;
 });
 
@@ -57,7 +57,7 @@ socket.on("getN", function (number) {
 socket.on('login', function (msg) {
     if (msg[0] == "done") {
         $("#mainInput").hide();
-
+        $("#friendsBar").toggleClass("disabled");
         $("#chatDiv").show();
         $("#messagesDiv").show();
         $("#mainSend").show();
@@ -65,6 +65,15 @@ socket.on('login', function (msg) {
     } else {
         alert("name already present")
     }
+
+    socket.on('search response', function (matchArray) {
+        console.log(matchArray); console.log("ok");
+        $('#chatFriends').empty();
+        matchArray.forEach(function (token) {
+            
+            $('#chatFriends').append(friendHtmlBuilder(token));
+        });
+    });
 
     socket.on('chat message', function (msg) {
         if (to == msg[0]) {
@@ -101,47 +110,29 @@ socket.on('login', function (msg) {
         window.scrollTo(0, document.body.scrollHeight);
     });
 
+
+
     socket.on("user logged", function (msg) {
         $('#chatList').empty();
         for (var i = 0; i < msg.length; i++) {
             if (msg[i]["name"] != name && msg[i]["name"] != "") {
-
                 $('#chatList').append($("<li class='chatLi' id = 'chatLiId" + i + "' >").text(msg[i]["name"]))
-
             }
         }
     });
 });
 
 $("#regBtn").on('click', function () {
-    console.log("added?")
-    $('#chatFriends').append(friendHtmlBuilder("newsdf "));
+    console.log("added?");
+
 
     socket.emit('registration', [$("#connectBtn").val(), n]);
-})
+});
 
 function test() {
-
-
 }
 
-
 function searchFrnd() {
-    var input, filter, ul, li, a, i;
     input = document.getElementById("frndSearchField");
-    filter = input.value.toUpperCase();
-    ul = document.getElementById("chatFriends");
-    li = ul.getElementsByClassName("friendSectionLi");
-
-    for (i = 0; i < li.length; i++) {
-        
-        var val = li[i].innerText.split(" ")[0].toUpperCase()
-
-        if (val.includes(filter) && val!= "") {
-            li[i].style.display = "";
-        } else {
-            li[i].style.display = "none";
-        }
-    }
-    
+    socket.emit('search request', [input.value, name]);
 }
