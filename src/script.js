@@ -24,21 +24,29 @@ $("body").on("click", ".sendRequest", function (el) {
     console.log("sended to " + $(el.target).attr("data-name"))
     socket.emit('send-friend-request', [ $(el.target).attr("data-name"), name ]);
 });
+/*
 
-// var h = $("body").css('height');
-// var w = $("body").css('width');
+var h = $("body").css('height');
+var w = $("body").css('width');
 
-// var hh = "";
-// for(var a = 0;a< h.length-2; a++){
-//     hh += h[a];
-// }
-// hh = parseInt(hh)
-// hh= hh-200;
-// hh = hh.toString();
-// hh = hh + "px";
+var hh = "";
+for(var a = 0;a< h.length-2; a++){
+    hh += h[a];
+}
+hh = parseInt(hh)
+hh= hh-200;
+hh = hh.toString();
+hh = hh + "px";
 
-// //$("#mainChat").css('height', hh)
-// //$("#tab-content").css('witdh', w)
+*/
+
+
+//$("#mainChat").css('height', hh)
+//$("#tab-content").css('witdh', w)
+
+
+// TODO valorizzare chatList con chat{}
+
 
 $("body").on("click", [".chatLi", ".chatLiNotified"], function (el) {
     // TODO Cambiare colore li una volta cliccato.
@@ -55,6 +63,29 @@ $("body").on("click", [".chatLi", ".chatLiNotified"], function (el) {
     }
 });
 
+$("body").on("click", ".acceptRequest", function (el) { // Accettazione della richiesta
+    socket.emit('frndRq-accepted', [$(el.target).attr("data-name"), name]);
+});
+
+socket.on('refresh-frnd&frndreq-bar', function(data){
+    frndList = data[1];
+    frndReqList = data[0];
+
+    console.log(data)
+
+    $('#reqFriendsUl').empty();
+    $('#chatFriends').empty(); // TODO cambiare id ul friends
+
+    frndList.forEach(function(token){
+        $('#chatFriends').append(friendHtmlBuilder(token));
+    });
+    frndReqList.forEach(function(token){
+        $('#reqFriendsUl').append(friendReqHtmlBuilder(token));
+    });
+});
+
+
+
 $('#formId').submit(function () {
     if (to != "") {
         socket.emit('chat message', [name, $('#sendMessageBtn').val(), to]);
@@ -63,6 +94,8 @@ $('#formId').submit(function () {
     $('#sendMessageBtn').val('');
     return false;
 });
+
+
 
 socket.on("getN", function (number) {
     n = number;
@@ -79,8 +112,10 @@ socket.on('login', function (msg) {
         $("#mainSend").show();
         name = $("#connectBtn").val();
     } else {
-        alert("name already present")
+        alert("name already present");
     }
+
+ 
 
     socket.on('search response', function (matchArray) {
         console.log(matchArray); console.log("ok");
@@ -155,6 +190,5 @@ function test() {
 
 function searchFrnd() {
     input = document.getElementById("userSearchField").value;
-    console.log(input);
     socket.emit('search request', [input, name]);
 }

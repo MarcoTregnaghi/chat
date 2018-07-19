@@ -8,6 +8,7 @@ var clients = []; //TODO cambiare in onlineclients
 var chats = {};
 var registeredClients = {};
 
+
 class Client {
   constructor(id, name) {
     this.id = id;
@@ -43,10 +44,33 @@ io.on('connection', function (socket) {
 
   console.log("[INFO] " + datetime + " user connected");
 
+  socket.on('send-friend-request', function(data){
+    console.log(registeredClients[data[1]]["id"])
+    
+    io.sockets.connected[registeredClients[data[1]]["id"]].emit('accepted-friendRq', data);
+  });
+
+  socket.on('frndRq-accepted', function(data){
+    // Modifico registeredC
+    registeredClients[data[0]]["friendReq"].pop(data[1]);
+    registeredClients[data[1]]["friendReq"].pop(data[0]);
+    //
+
+    registeredClients[data[1]]["friends"].push(data[0])
+    registeredClients[data[0]]["friends"].push(data[1])
+
+
+    io.sockets.connected[registeredClients[data[0]]["id"]].emit('refresh-frnd&frndreq-bar', [registeredClients[data[0]]["frndReq"], registeredClients[data[0]]["friends"]]);
+    io.sockets.connected[registeredClients[data[1]]["id"]].emit('refresh-frnd&frndreq-bar', [registeredClients[data[1]]["frndReq"], registeredClients[data[1]]["friends"]]);
+    
+  });
+  
+  
+
   socket.on('registration', function (reqName) {
     if (checkClients(reqName[0], clients)) {
       newName = reqName[0];
-      registeredClients[newName] = { "friendReq": [] }
+      registeredClients[newName] = { "friendReq": [], "id": socket.id, "friends": []};
       clients[reqName[1]]["name"] = reqName[0];
 
       // TODO indagare causa problema:
