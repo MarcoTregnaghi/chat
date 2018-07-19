@@ -11,6 +11,20 @@ function friendHtmlBuilder(name) {
     return "<li class = 'friendSectionLi'>" + name + "                 <button type='button' class='btn btn-primary btn-sm' >Start Chat</button>   <button type='button' class='btn btn-primary btn-sm'>Remove Friend</button></li>";
 }
 
+
+function searchMatchHtmlBuilder(name) {
+    return "<li class = 'friendSectionLi'>" + name + "                 <button type='button' class='btn btn-primary btn-sm sendRequest' data-name='"+name+ "'>Send friend request</button>";
+}
+
+function friendReqHtmlBuilder(name) {
+    return "<li class = 'friendSectionLi'>" + name + "                 <button type='button' class='btn btn-primary btn-sm acceptRequest' data-name='"+name+ "'>Accept</button><button type='button' class='btn btn-primary btn-sm denyRequest' data-name='"+name+ "'>Deny</button>";
+}
+
+$("body").on("click", ".sendRequest", function (el) {
+    console.log("sended to " + $(el.target).attr("data-name"))
+    socket.emit('send-friend-request', [ $(el.target).attr("data-name"), name ]);
+});
+
 // var h = $("body").css('height');
 // var w = $("body").css('width');
 
@@ -58,6 +72,8 @@ socket.on('login', function (msg) {
     if (msg[0] == "done") {
         $("#mainInput").hide();
         $("#friendsBar").toggleClass("disabled");
+        $("#friendsReqBar").toggleClass("disabled");
+        $("#searchReqBar").toggleClass("disabled");
         $("#chatDiv").show();
         $("#messagesDiv").show();
         $("#mainSend").show();
@@ -68,11 +84,16 @@ socket.on('login', function (msg) {
 
     socket.on('search response', function (matchArray) {
         console.log(matchArray); console.log("ok");
-        $('#chatFriends').empty();
+        $('#searchMatchUl').empty();
         matchArray.forEach(function (token) {
-            
-            $('#chatFriends').append(friendHtmlBuilder(token));
+            $('#searchMatchUl').append(searchMatchHtmlBuilder(token));
         });
+    });
+
+    socket.on('friendReq', function(friendReqData){
+        $('#reqFriendsUl').append(friendReqHtmlBuilder(friendReqData));
+        $('#reqFriendsUl').append();
+        console.log("i received req from " + friendReqData);
     });
 
     socket.on('chat message', function (msg) {
@@ -133,6 +154,7 @@ function test() {
 }
 
 function searchFrnd() {
-    input = document.getElementById("frndSearchField");
-    socket.emit('search request', [input.value, name]);
+    input = document.getElementById("userSearchField").value;
+    console.log(input);
+    socket.emit('search request', [input, name]);
 }

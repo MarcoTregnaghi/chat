@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -229,7 +229,8 @@
     }
   </style>
 
-  <link href=".\style.css"> <!--TODO get lato server-->
+  <link href=".\style.css">
+  <!--TODO get lato server-->
 
 </head>
 
@@ -239,31 +240,30 @@
   <div class="container mt-3" id="testcont">
     <ul class="nav nav-tabs" id="navBar">
       <li class="nav-item">
-        <a class="nav-link active" id = "chatBar" data-toggle="tab" href="#home">Chat</a>
+        <a class="nav-link active" id="chatBar" data-toggle="tab" href="#home">Chat</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link disabled" id = "friendsBar" data-toggle="tab" href="#sectionFriends">Friends</a>
+        <a class="nav-link disabled" id="friendsBar" data-toggle="tab" href="#sectionFriends">Friends</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link disabled" data-toggle="tab" href="#menu2">Coming Soon</a>
+        <a class="nav-link disabled" id="searchReqBar" data-toggle="tab" href="#sectionSearchUsers">Search Users</a>
       </li>
+      <li class="nav-item">
+          <a class="nav-link disabled" id="friendsReqBar" data-toggle="tab" href="#sectionFriendRequest">Friend Request</a>
+        </li>
       <div id="mainInput">
         <input type="text" id="connectBtn">
         <button type="button" class="btn btn-primary btn-sm" id="regBtn">connect</button>
       </div>
     </ul>
 
-    <span style="width:100%;">Non refreshare la pagina, poichè potrebbe causare bug, limitati a chiudere la scheda e riaprirne un'altra.</span>
+    <span style="width:100%;">Non refreshare la pagina poichè potrebbe causare bug. Limitati a chiudere la scheda e riaprirne un'altra.</span>
 
     <div class="tab-content" id="aa">
 
       <div id="sectionFriends" class="container tab-pane fade">
         <div id="frndFluid" class="container-fluid">
           <div class="row" id="mainFriends">
-            <div id="frndInput">
-              <input type="text" id="frndSearchField" onkeyup="searchFrnd()">
-              <button type="button" class="btn btn-primary btn-sm">Search for people online</button>
-            </div>
             <div id="chatFriendsContainer">
               <ul id="chatFriends">
                 <!-- <li class="friendSectionLi">t12345
@@ -298,9 +298,34 @@
         </div>
       </div>
 
-      <div id="menu2" class="container tab-pane fade">
-        
+      <div id="sectionSearchUsers" class="container tab-pane fade">
+        <div id="reqFrndFluid" class="container-fluid">
+          <div class="row" id="mainFriendsReq">
+              <div id="frndInput">
+                  <input type="text" id="userSearchField" onkeyup="searchFrnd()">
+                  <button type="button" class="btn btn-primary btn-sm">Search for people online</button>
+                </div>
+            <div id="reqFriendsContainer">
+              <ul id="searchMatchUl">
+              </ul>
+            </div>
+          </div>
+        </div>
+
       </div>
+
+      <div id="sectionFriendRequest" class="container tab-pane fade">
+          <div id="reqFrndFluid" class="container-fluid">
+           
+                
+              <div id="reqFriendsContainer">
+                <ul id="reqFriendsUl">
+                </ul>
+              </div>
+            
+          </div>
+  
+        </div>
     </div>
   </div>
 
