@@ -44,33 +44,57 @@ io.on('connection', function (socket) {
 
   console.log("[INFO] " + datetime + " user connected");
 
-  socket.on('send-friend-request', function(data){
+  socket.on('send-friend-request', function (data) {
     console.log(registeredClients[data[1]]["id"])
-    
-    io.sockets.connected[registeredClients[data[1]]["id"]].emit('accepted-friendRq', data);
+
+    for (var i = 0; i < clients.length; i++) {
+      if (data[1] == clients[i]["name"]) {
+        io.sockets.connected[clients[i]["id"]].emit('accepted-friendRq', data);
+      }
+    }
   });
 
-  socket.on('frndRq-accepted', function(data){
+  socket.on('frndRq-accepted', function (data) {
+    var currentdate = new Date();
+    var datetime = currentdate.getDate() + "/"
+      + (currentdate.getMonth() + 1) + "/"
+      + currentdate.getFullYear() + " @ "
+      + currentdate.getHours() + ":"
+      + currentdate.getMinutes() + ":"
+      + currentdate.getSeconds();
+
+    console.log("[INFO] " + datetime + " friend request accepted from " + data[1] + " to " + data[0]);
+    
     // Modifico registeredC
     registeredClients[data[0]]["friendReq"].pop(data[1]);
     registeredClients[data[1]]["friendReq"].pop(data[0]);
-    //
-
     registeredClients[data[1]]["friends"].push(data[0])
     registeredClients[data[0]]["friends"].push(data[1])
 
-
-    io.sockets.connected[registeredClients[data[0]]["id"]].emit('refresh-frnd&frndreq-bar', [registeredClients[data[0]]["frndReq"], registeredClients[data[0]]["friends"]]);
-    io.sockets.connected[registeredClients[data[1]]["id"]].emit('refresh-frnd&frndreq-bar', [registeredClients[data[1]]["frndReq"], registeredClients[data[1]]["friends"]]);
-    
+    // Notifico
+    for (var i = 0; i < clients.length; i++) {
+      if (data[0] == clients[i]["name"]) {
+        io.sockets.connected[clients[i]["id"]].emit('refresh-frnd&frndreq-bar', [registeredClients[data[0]]["frndReq"], registeredClients[data[0]]["friends"]]);
+      } else if (data[1] == clients[i]["name"]) {
+        io.sockets.connected[clients[i]["id"]].emit('refresh-frnd&frndreq-bar', [registeredClients[data[1]]["frndReq"], registeredClients[data[1]]["friends"]]);
+      }
+    }
   });
-  
-  
+
+  socket.on('start-chat', function(data) {
+    
+
+  });
 
   socket.on('registration', function (reqName) {
+
     if (checkClients(reqName[0], clients)) {
       newName = reqName[0];
-      registeredClients[newName] = { "friendReq": [], "id": socket.id, "friends": []};
+
+      if (!registeredClients[newName]) {
+        registeredClients[newName] = { "friendReq": [], "id": socket.id, "friends": [] };
+      }
+
       clients[reqName[1]]["name"] = reqName[0];
 
       // TODO indagare causa problema:
@@ -100,6 +124,14 @@ io.on('connection', function (socket) {
       // }
 
       // ************************
+
+      socket.on('data-on-login-req', function (name) {
+        console.log("received from " + name);
+        console.log("\n" + registeredClients[name] + "\n" + registeredClients[name]["friends"] + "\n" + chats[name] + "\n")
+        let ret = [registeredClients[name]["friendReq"], registeredClients[name]["friends"], chats[name], registeredClients];
+        io.sockets.connected[socket.id].emit('data-on-login-resp', ret);
+      });
+
       socket.on('search request', function (data) {
         var ret = filterOnlineClient(data[0], data[1]);
         io.sockets.connected[socket.id].emit('search response', ret);
@@ -126,7 +158,6 @@ io.on('connection', function (socket) {
             if (array.indexOf(rfrnd) > -1) {
               chat = chats[rfrom][i][rfrnd];
               v = chats[rfrom][i]["from"];
-              console.log("sended chat list")
               io.sockets.connected[socket.id].emit('chat-list', [chat, v, chats]);
             }
           }
@@ -145,14 +176,12 @@ io.on('connection', function (socket) {
           + currentdate.getSeconds();
 
         console.log("[INFO] " + datetime + " friend request from " + friendRequestData[1] + " to " + friendRequestData[0]);
-        
+
         registeredClients[friendRequestData[0]]["friendReq"].push(friendRequestData[1]);
         for (var i = 0; i < clients.length; i++) {
           if (clients[i]["name"] == friendRequestData[0]) {
-
             io.sockets.connected[clients[i]["id"]].emit('friendReq', friendRequestData[1]);
           }
-
         }
       });
 
@@ -164,8 +193,6 @@ io.on('connection', function (socket) {
           }
         }
 
-        
-
         // ************Salvataggio messaggio************
         sender = data[2];
         receiver = data[0];
@@ -173,19 +200,19 @@ io.on('connection', function (socket) {
         boo = true
 
         if (testarrkey.indexOf(sender) < 0) { // Ricevente
-          chats[sender] = []
-          chats[sender].push({})
+          chats[sender] = [];
+          chats[sender].push({});
           chats[sender][chats[sender].length - 1][receiver] = [];
-          chats[sender][chats[sender].length - 1][receiver].push(data[1])
+          chats[sender][chats[sender].length - 1][receiver].push(data[1]);
           chats[sender][chats[sender].length - 1]["from"] = [];
-          chats[sender][chats[sender].length - 1]["from"].push(0)
+          chats[sender][chats[sender].length - 1]["from"].push(0);
         } else {
           for (var i = 0; i < chats[sender].length; i++) {
             var kk = Object.keys(chats[sender][i]);
             if (kk.indexOf(receiver) > -1) {
               // aggiungo il messaggio
-              chats[sender][i][receiver].push(data[1])
-              chats[sender][i]["from"].push(0)
+              chats[sender][i][receiver].push(data[1]);
+              chats[sender][i]["from"].push(0);
               boo = false;
             }
           }
@@ -193,9 +220,9 @@ io.on('connection', function (socket) {
             // creo la lista
             chats[sender].push({});
             chats[sender][chats[sender].length - 1][receiver] = [];
-            chats[sender][chats[sender].length - 1][receiver].push(data[1])
-            chats[sender][chats[sender].length - 1]["from"] = []
-            chats[sender][chats[sender].length - 1]["from"].push(0)
+            chats[sender][chats[sender].length - 1][receiver].push(data[1]);
+            chats[sender][chats[sender].length - 1]["from"] = [];
+            chats[sender][chats[sender].length - 1]["from"].push(0);
           }
         }
 
@@ -254,8 +281,8 @@ io.on('connection', function (socket) {
       }
     }
     lastClient--;
-    for (var i = 0; i < clients.length; i++) {
-      io.sockets.connected[clients[i]["id"]].emit('user logged', clients);
+    for (var i = 0; i < registeredClients; i++) {
+      io.sockets.connected[clients[i]["id"]].emit('friend-logged', clients);
     }
   });
 }
