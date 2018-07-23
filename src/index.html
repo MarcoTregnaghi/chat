@@ -236,7 +236,6 @@
 
 <body>
   <!--TODO placeholders & title button-->
-
   <div class="container mt-3" id="testcont">
     <ul class="nav nav-tabs" id="navBar">
       <li class="nav-item">
@@ -256,30 +255,22 @@
         <button type="button" class="btn btn-primary btn-sm" id="regBtn">connect</button>
       </div>
     </ul>
-
     <span style="width:100%;">Non refreshare la pagina poichè potrebbe causare bug. Limitati a chiudere la scheda e riaprirne un'altra.</span>
-    <br><span>Logged as: </span><span id = "loggedAs" style="color: red;"></span>
+    <button id="signOutBtn">|Sign out|</button>
+    <br>
+    <span>Logged as: </span>
+    <span id="loggedAs" style="color: red;"></span>
     <div class="tab-content" id="aa">
-
       <div id="sectionFriends" class="container tab-pane fade">
         <div id="frndFluid" class="container-fluid">
           <div class="row" id="mainFriends">
             <div id="chatFriendsContainer">
               <ul id="chatFriends">
-                <!-- <li class="friendSectionLi">t12345
-                  <button type="button" class="btn btn-primary btn-sm">Start Chat</button>
-                  <button type="button" class="btn btn-primary btn-sm">Remove Friend</button>
-                </li>
-                <li class="friendSectionLi">t144
-                  <button type="button" class="btn btn-primary btn-sm">Start Chat</button>
-                  <button type="button" class="btn btn-primary btn-sm">Remove Friend</button>
-                </li> -->
               </ul>
             </div>
           </div>
         </div>
       </div>
-
       <div id="home" class="container tab-pane active">
         <!-- TODO no .show div, toggleClass  -->
         <div class="flex-container" id="mainChat">
@@ -297,7 +288,6 @@
           </form>
         </div>
       </div>
-
       <div id="sectionSearchUsers" class="container tab-pane fade">
         <div id="reqFrndFluid" class="container-fluid">
           <div class="row" id="mainFriendsReq">
@@ -322,11 +312,6 @@
       </div>
     </div>
   </div>
-
-
-
-
-
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
@@ -334,9 +319,6 @@
   <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
   <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
   <script src="script.js"></script>
-
-
-
 </body>
 
 </html>
