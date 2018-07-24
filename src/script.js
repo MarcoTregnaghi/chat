@@ -7,11 +7,13 @@ var socket = io();
 var name = ""
 var n;
 var to = "";
-
 var actualChat = [];
 
-function test() {
-}
+/*
+
+TODO: PROBLEMA INVIO RICHIESTE AMICIZIA
+
+*/
 
 function searchFrnd() {
     input = document.getElementById("userSearchField").value;
@@ -30,28 +32,32 @@ function friendReqHtmlBuilder(name) {
     return "<li class = 'friendSectionLi'>" + name + "                 <button type='button' class='btn btn-primary btn-sm acceptRequest' data-name='" + name + "'>Accept</button><button type='button' class='btn btn-primary btn-sm denyRequest' data-name='" + name + "'>Deny</button>";
 }
 
+function friendReqSendedHtmlBuilder(name) {
+    return "<li class = 'friendSectionLi'>" + name + "                 <button type='button' class='btn btn-primary btn-sm deleteRequest' data-name='" + name + "'>Delete Request</button>";
+}
+
 $("body").on("click", ".sendRequest", function (el) {
+    $('#reqFriendsSendedUl').show();
+    $('#reqFriendsSendedUl').append(friendReqSendedHtmlBuilder($(el.target).attr("data-name")));
     socket.emit('send-friend-request', [$(el.target).attr("data-name"), name]);
 });
 
 $("body").on("click", ".removeFriendBtn", function (el) {
     socket.emit('remove-friend-request', [$(el.target).attr("data-name"), name]);
 
-    for(var i = 0; i< $("#chatList").children().length;i++){
-        if($("#chatList").children()[i].innerHTML == $(el.target).attr("data-name")){
+    for (var i = 0; i < $("#chatList").children().length; i++) {
+        if ($("#chatList").children()[i].innerHTML == $(el.target).attr("data-name")) {
             $("#chatLiId" + i).remove();
         }
     }
 
-    if(to == $(el.target).attr("data-name")){
+    if (to == $(el.target).attr("data-name")) {
         to = "";
         $('#messages').empty();
 
 
     }
 });
-
-// TODO valorizzare chatList con chat{}
 
 $("body").on("click", [".chatLi", ".chatLiNotified"], function (el) {
     // TODO Cambiare colore li una volta cliccato.
@@ -68,6 +74,11 @@ $("body").on("click", [".chatLi", ".chatLiNotified"], function (el) {
 
 $("body").on("click", ".acceptRequest", function (el) { // Accettazione della richiesta di amicizia
     socket.emit('frndRq-accepted', [$(el.target).attr("data-name"), name]);
+    console.log("ok " + $(el.target).attr("data-name"))
+});
+
+$("body").on("click", ".denyRequest", function (el) { // Accettazione della richiesta di amicizia
+    socket.emit('frndRq-refused', [$(el.target).attr("data-name"), name]);
 });
 
 $("body").on("click", ".startChat", function (el) { // Start chat button start-chat
@@ -114,7 +125,7 @@ $("body").on("click", ".startChat", function (el) { // Start chat button start-c
     socket.emit('chat-request', [name, to]);
 });
 
-$("#signOutBtn").on('click', function() {
+$("#signOutBtn").on('click', function () {
     console.log("disconnection...")
     socket.emit('sign-out', []);
 
@@ -151,74 +162,92 @@ socket.on("getN", function (number) { // TODO cambiare nome evento
 socket.on('login', function (msg) {
     if (msg[0] == "done") {
         // La registrazione è avvenuta con successo,
-        // abilitazione funzionalità di chat, friends, search user e friend request.
+        // abilitazione funzionalità di chat, friends, search user e friend requests.
 
         socket.on('data-on-login-resp', function (data) {
+            $('#reqFriendsSendedUl').hide();
+            $('#reqFriendsUl').hide();
             // Popolo i nav
             data.forEach(function (token) {
                 if (token == null) {
                     token = [];
                 }
             });
-        
+
             // Nav Friends
             var frndList = data[1];
             frndList.forEach(function (token) {
                 $('#chatFriends').append(friendHtmlBuilder(token));
             });
-        
-            // Nav Friends Request
-            var frndReqList = data[0];
+
+            // Nav Friends Request (inBox)
+            var frndReqList = data[0]["inBox"];
             frndReqList.forEach(function (token) {
+                $('#reqFriendsUl').show();
                 $('#reqFriendsUl').append(friendReqHtmlBuilder(token));
             });
-        
+
+            // Nav Friends Request (sended)
+            var frndReqSendedList = data[0]["sended"];
+            frndReqSendedList.forEach(function (token) {
+                $('#reqFriendsSendedUl').show();
+                $('#reqFriendsSendedUl').append(friendReqSendedHtmlBuilder(token));
+            });
+
             // Nav Chat
-        
             if (data[2] == null) {
                 actualChat = [];
             } else {
                 data[2].forEach(function (token) {
                     var toPush = Object.keys(token)[0];
                     actualChat.push(toPush);
-        
                 });
             }
+
             $('#chatList').empty();
-            //if (actualChat != null) {
             for (var i = 0; i < actualChat.length; i++) {
                 var nm = Object.keys(data[2][i]);
                 $('#chatList').append($("<li class='chatLi' id = 'chatLiId" + i + "' >").text(nm[0]));
             }
-            //}
+            
         });
 
         socket.on('refresh-frnd&frndreq-bar', function (data) {
+            $('#reqFriendsSendedUl').hide();
+            $('#reqFriendsUl').hide();
             frndList = data[1];
-            console.log(data)
-            data[0] == null ? frndReqList = [] : frndReqList = data[0];
-    
+            
+            data[0]["inBox"] == null ? frndReqList = [] : frndReqList = data[0]["inBox"];
+            data[1]["sended"] == null ? frndReqSendedList = [] : frndReqSendedList = data[1]["sended"];
+
             $('#reqFriendsUl').empty();
             $('#chatFriends').empty(); // TODO cambiare id ul friends
-    
+
             frndList.forEach(function (token) {
                 $('#chatFriends').append(friendHtmlBuilder(token));
             });
+
             frndReqList.forEach(function (token) {
+                $('#reqFriendsUl').show();
                 $('#reqFriendsUl').append(friendReqHtmlBuilder(token));
             });
+
+            frndReqSendedList.forEach(function (token) {
+                $('#reqFriendsSendedUl').show();
+                $('#reqFriendsSendedUl').append(friendReqHtmlBuilder(token));
+            });
         });
-    
+
         socket.on('search response', function (matchArray) {
             $('#searchMatchUl').empty();
             matchArray.forEach(function (token) {
                 $('#searchMatchUl').append(searchMatchHtmlBuilder(token));
             });
         });
-    
+
         socket.on('friendReq', function (friendReqData) {
+            $('#reqFriendsUl').show();
             $('#reqFriendsUl').append(friendReqHtmlBuilder(friendReqData));
-            $('#reqFriendsUl').append();
         });
 
         socket.on('chat-list', function (msg) {
@@ -251,7 +280,7 @@ socket.on('login', function (msg) {
                     window.scrollTo(0, document.body.scrollHeight);
                 } else { // La chat non è attiva sul mittente, notifico.
                     var a = $("#chatList").children().length;
-    
+
                     for (var index = 0; index < a; index++) {
                         if ($("#chatList").children()[index].innerHTML == msg[0]) {
                             $("#chatList").children()[index].className = "chatLiNotified";
@@ -265,21 +294,25 @@ socket.on('login', function (msg) {
             }
         });
 
-        socket.on('friend-removed', function(from){
+        socket.on('friend-removed', function (from) {
 
         });
 
         name = $("#connectBtn").val();
-        $("#loggedAs").text(name);
-        $("#mainInput").hide();
-        $("#friendsBar").toggleClass("disabled");
-        $("#friendsReqBar").toggleClass("disabled");
-        $("#searchReqBar").toggleClass("disabled");
-        $("#chatDiv").show();
-        $("#messagesDiv").show();
-        $("#mainSend").show();
 
-        // Richiedo le informazioni base dell'utente
+        // Interfaccia utente loggato.
+        {
+            $("#loggedAs").text(name);
+            $("#mainInput").hide();
+            $("#friendsBar").toggleClass("disabled");
+            $("#friendsReqBar").toggleClass("disabled");
+            $("#searchReqBar").toggleClass("disabled");
+            $("#chatDiv").show();
+            $("#messagesDiv").show();
+            $("#mainSend").show();
+        }
+
+        // Richiedo le mie informazioni base.
         socket.emit('data-on-login-req', name);
 
     } else {

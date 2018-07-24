@@ -2,236 +2,8 @@
 <html>
 
 <head>
+  <link rel="stylesheet" type="text/css" href="style.css">
   <title>Ideas Hub</title>
-
-  <style>
-    html,
-    body {
-      font: 13px Helvetica, Arial;
-      width: 100%;
-      height: 95%;
-    }
-
-
-    form {
-      background: lightsteelblue;
-      padding: 3px;
-      width: 100%;
-    }
-
-    form {
-      border: 0;
-      padding: 10px;
-    }
-
-    form button {
-      background: lightsteelblue;
-      border: none;
-      padding: 10px;
-      color: white;
-    }
-
-    #messages {
-      list-style-type: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    #messages li {
-      padding: 5px 10px;
-    }
-
-    #messages li:nth-child(odd) {
-      background: #eee;
-    }
-
-    #messages {
-      margin-bottom: 40px;
-    }
-
-    .flex-container {
-      width: 100%;
-
-      display: flex;
-      flex-wrap: nowrap;
-    }
-
-    #chatDiv {
-      background-color: white;
-      width: 30%;
-      height: 100%;
-      padding: 10px;
-      text-align: center;
-      line-height: 75px;
-      font-size: 18px;
-      border-top: 2px solid #79ca84;
-      border-left: 2px solid #79ca84;
-      border-bottom: 2px solid #79ca84;
-      display: none;
-    }
-
-    #messagesDiv {
-      background-color: white;
-      display: none;
-      height: 100%;
-      width: 60%;
-      overflow: scroll;
-      line-height: 75px;
-      font-size: 18px;
-      border: 2px solid #79ca84;
-    }
-
-    .chatLi {
-      background-color: lightblue;
-      border: 1px solid white;
-      font-size: 13px;
-    }
-
-    .chatLiNotified {
-      background-color: lightseagreen;
-      border: 1px solid white;
-      font-size: 13px;
-    }
-
-    #titleContainer {
-      background-color: #79ca84;
-      height: 5%;
-      width: 100%;
-    }
-
-    #title {
-      width: 40%;
-      height: 50%;
-      left: 0px;
-      top: 40%;
-    }
-
-    #mainChat {
-
-      top: 15%;
-      height: 90%;
-      width: 100%;
-      padding: 10px;
-    }
-
-    #mainFriends {
-      top: 15%;
-      height: 90%;
-      width: 100%;
-      padding: 10px;
-    }
-
-    #mainSend {
-      display: none;
-      height: 4%;
-      width: 91%;
-      bottom: 0%;
-      background-color: #79ca84;
-    }
-
-    #formId {
-      background-color: #79ca84;
-    }
-
-    .main {
-      height: 100%;
-      width: 100%;
-    }
-
-    #mainInput {
-      position: absolute;
-      right: 10%;
-      top: 18px;
-    }
-
-    #frndInput {
-      width: 100%;
-      right: 10%;
-      top: 18px;
-      height: 30px;
-    }
-
-    #testcont {
-      height: 100%;
-      width: 100%;
-
-    }
-
-    #aa {
-      height: 95% !important;
-      width: 100%;
-
-    }
-
-    #tabcontent {
-      height: 100%;
-      width: 100%;
-
-    }
-
-    #menu1 {
-      height: 100% !important;
-      width: 100% !important;
-
-    }
-
-    #home {
-      height: 100%;
-    }
-
-    body {
-      background: url("mainBG.png");
-    }
-
-    .m {
-      width: 75%;
-      height: 90%;
-      padding: 5px;
-    }
-
-    #frndSearch {}
-
-    #sendButton {
-      width: 23.9%;
-
-    }
-
-    #connectBtn {
-      top: 1%;
-    }
-
-    #sectionFriends {
-      height: 90%;
-    }
-
-    .friendSectionLi {
-      padding: 10px;
-    }
-
-    .removeFrndBtn {}
-
-    .startChatFrndBtn {}
-
-    #frndFluid {
-      height: 100%;
-    }
-
-    #chatFriendsContainer {
-      top: 10%;
-      width: 100%;
-      height: 100%;
-    }
-
-    .noListClass {
-      list-style-type: none;
-      padding-left: 0;
-      margin-left: 0;
-    }
-  </style>
-
-  <link href=".\style.css">
-  <!--TODO get lato server-->
-
 </head>
 
 <body>
@@ -255,8 +27,7 @@
         <button type="button" class="btn btn-primary btn-sm" id="regBtn">connect</button>
       </div>
     </ul>
-    <span style="width:100%;">Non refreshare la pagina poichè potrebbe causare bug. Limitati a chiudere la scheda e riaprirne un'altra.</span>
-    <button id="signOutBtn">|Sign out|</button>
+    <button id="signOutBtn">Sign out</button>
     <br>
     <span>Logged as: </span>
     <span id="loggedAs" style="color: red;"></span>
@@ -305,7 +76,11 @@
       <div id="sectionFriendRequest" class="container tab-pane fade">
         <div id="reqFrndFluid" class="container-fluid">
           <div id="reqFriendsContainer">
-            <ul id="reqFriendsUl">
+            <br>
+            <ul class="frndReqUl" id="reqFriendsUl">
+            </ul>
+            <br>
+            <ul class="frndReqUl" id="reqFriendsSendedUl">
             </ul>
           </div>
         </div>

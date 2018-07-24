@@ -25,6 +25,10 @@ app.get('/script.js', function (req, res) {
 app.get('/mainBG.png', function (req, res) {
   res.sendFile(__dirname + '/mainBG.png');
 });
+
+app.get('/style.css', function (req, res) {
+  res.sendFile(__dirname + '/style.css');
+});
 // *******************************************************************
 
 io.on('connection', function (socket) {
@@ -34,20 +38,14 @@ io.on('connection', function (socket) {
 
   console.log("[INFO] " + getTime() + " user connected");
 
-  socket.on('send-friend-request', function (data) {
-    for (var i = 0; i < clients.length; i++) {
-      if (data[1] == clients[i]["name"]) {
-        io.sockets.connected[clients[i]["id"]].emit('accepted-friendRq', data);
-      }
-    }
-  });
+  
 
   socket.on('frndRq-accepted', function (data) {
     console.log("[INFO] " + getTime() + " friend request accepted from " + data[1] + " to " + data[0]);
 
     // Modifico registeredC
-    registeredClients[data[0]]["friendReq"].splice(registeredClients[data[0]]["friendReq"].indexOf(data[1]));
-    registeredClients[data[1]]["friendReq"].splice(registeredClients[data[1]]["friendReq"].indexOf(data[0]));
+    registeredClients[data[0]]["friendReq"]["inBox"].splice(registeredClients[data[0]]["friendReq"]["inBox"].indexOf(data[1]), 1);
+    registeredClients[data[1]]["friendReq"]["inBox"].splice(registeredClients[data[1]]["friendReq"]["inBox"].indexOf(data[0]), 1);
     registeredClients[data[1]]["friends"].push(data[0]);
     registeredClients[data[0]]["friends"].push(data[1]);
 
@@ -61,10 +59,27 @@ io.on('connection', function (socket) {
     }
   });
 
+  socket.on('frndRq-refused', function (data) {
+    console.log("[INFO] " + getTime() + " friend request refused from " + data[1] + " to " + data[0]);
+
+    // Modifico registeredC
+    registeredClients[data[0]]["friendReq"]["inBox"].splice(registeredClients[data[0]]["friendReq"]["inBox"].indexOf(data[1]), 1);
+    registeredClients[data[1]]["friendReq"]["inBox"].splice(registeredClients[data[1]]["friendReq"]["inBox"].indexOf(data[0]), 1);
+
+    // Notifico
+    if (clients[data[0]]) {
+      io.sockets.connected[clients[data[0]]["id"]].emit('refresh-frnd&frndreq-bar', [registeredClients[data[0]]["friendReq"]["inBox"], registeredClients[data[0]]["friends"]]);
+    }
+
+    if (clients[data[1]]) {
+      io.sockets.connected[clients[data[1]]["id"]].emit('refresh-frnd&frndreq-bar', [registeredClients[data[1]]["friendReq"]["inBox"], registeredClients[data[1]]["friends"]]);
+    }
+  });
+
   socket.on('remove-friend-request', function (data) {
     // Modifico registeredC
-    registeredClients[data[1]]["friends"].splice(registeredClients[data[1]]["friends"].indexOf(data[0]));
-    registeredClients[data[0]]["friends"].splice(registeredClients[data[0]]["friends"].indexOf(data[1]));
+    registeredClients[data[1]]["friends"].splice(registeredClients[data[1]]["friends"].indexOf(data[0]), 1);
+    registeredClients[data[0]]["friends"].splice(registeredClients[data[0]]["friends"].indexOf(data[1]), 1);
 
     // Notifico.
     if (clients[data[0]]) {
@@ -82,7 +97,7 @@ io.on('connection', function (socket) {
       newName = reqName[0];
 
       if (!registeredClients[newName]) {
-        registeredClients[newName] = { "friendReq": [], "id": socket.id, "friends": [] };
+        registeredClients[newName] = { "friendReq": {"inBox": [], "sended": []}, "id": socket.id, "friends": [] };
       }
 
       clients[reqName[0]] = { "id": socket.id };
@@ -130,18 +145,16 @@ io.on('connection', function (socket) {
       socket.on('send-friend-request', function (friendRequestData) {
         console.log("[INFO] " + getTime() + " friend request from " + friendRequestData[1] + " to " + friendRequestData[0]);
 
-        registeredClients[friendRequestData[0]]["friendReq"].push(friendRequestData[1]);
+        registeredClients[friendRequestData[0]]["friendReq"]["inBox"].push(friendRequestData[1]);
+        registeredClients[friendRequestData[1]]["friendReq"]["sended"].push(friendRequestData[0]);
 
         if (clients[friendRequestData[0]]) {
           io.sockets.connected[clients[friendRequestData[0]]["id"]].emit('friendReq', friendRequestData[1]);
         }
-
       });
 
       socket.on('remove-friend-request', function (friendRequestData) {
         console.log("[INFO] " + getTime() + " remove friend request from " + friendRequestData[1] + " to " + friendRequestData[0]);
-
-        registeredClients[friendRequestData[0]]["friendReq"].push(friendRequestData[1]);
 
         if (clients[friendRequestData[0]] != undefined) {
           io.sockets.connected[clients[friendRequestData[0]]["id"]].emit('friend-removed', friendRequestData[1]);
