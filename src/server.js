@@ -4,6 +4,7 @@
  */
 
 var app = require("express")();
+const bcrypt = require('bcryptjs');
 var http = require("http").Server(app);
 var io = require('socket.io')(http);
 var $ = require('jquery');
@@ -13,9 +14,15 @@ var clients = {}; //TODO cambiare in onlineclients
 var chats = {};
 var registeredClients = {};
 
+passwords = [];
+
+
 // *************File da mandare al client al collegamento*************
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
+});
+app.post('/', function (req, res) {
+  res.redirect(__dirname + '/login.html');
 });
 
 app.get('/script.js', function (req, res) {
@@ -32,13 +39,29 @@ app.get('/style.css', function (req, res) {
 // *******************************************************************
 
 io.on('connection', function (socket) {
+  // socket.on('test', function(data){
+  //   if(data == "go"){
+  //     app.redirect("./login.html");
+  //   }
+  //   if(passwords.length){
+  //     if(bcrypt.compareSync(data, passwords[0])) {
+  //       console.log("match")
+  //      } else {
+  //       console.log("NO match")
+  //      }  
+      
+  //     passwords.pop();
+  //   }
+  //   console.log(data);
+  //   let hash = bcrypt.hashSync(data, 10);
+  //   passwords.push(hash);
+  //   console.log(passwords);
+  // })
 
   io.sockets.connected[socket.id].emit("getN", lastClient);
   lastClient++;
 
   console.log("[INFO] " + getTime() + " user connected");
-
-  
 
   socket.on('frndRq-accepted', function (data) {
     console.log("[INFO] " + getTime() + " friend request accepted from " + data[1] + " to " + data[0]);

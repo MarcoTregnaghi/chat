@@ -3,17 +3,17 @@
  * 
  */
 
+
 var socket = io();
 var name = ""
 var n;
 var to = "";
 var actualChat = [];
 
-/*
+$("#sendpw").on('click', function(){
 
-TODO: PROBLEMA INVIO RICHIESTE AMICIZIA
-
-*/
+    socket.emit('test', $("#testHash").val());
+});
 
 function searchFrnd() {
     input = document.getElementById("userSearchField").value;
