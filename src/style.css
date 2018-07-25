@@ -1,3 +1,13 @@
+
+
+
+
+
+
+
+
+/************************************/
+
 html, body {
   font: 13px Helvetica, Arial;
   width: 100%;
@@ -174,7 +184,7 @@ body {
   padding: 5px;
 }
 
-/* #frndSearch {} */
+ #frndSearch {} 
 
 #sendButton {
   width: 23.9%;
@@ -192,9 +202,9 @@ body {
   padding: 10px;
 }
 
-/* .removeFrndBtn {}
+ .removeFrndBtn {}
 
-.startChatFrndBtn {} */
+.startChatFrndBtn {} 
 
 #frndFluid {
   height: 100%;
@@ -214,4 +224,4 @@ body {
 
 .frndReqUl {
   border: 1px solid blue;
-}
+} 

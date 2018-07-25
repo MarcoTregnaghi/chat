@@ -2,7 +2,8 @@
  * @author Marco Tregnaghi <tregnaghi.marco@gmail.com>
  * 
  */
-
+var express = require("express");
+var fs = require("fs");
 var app = require("express")();
 const bcrypt = require('bcryptjs');
 var http = require("http").Server(app);
@@ -15,23 +16,29 @@ var chats = {};
 var registeredClients = {};
 
 passwords = [];
-
+app.use(express.static('.\\'));
+//http.use('./',  app.static(__dirname + './'));
 
 // *************File da mandare al client al collegamento*************
-app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/index.html');
-});
-app.post('/', function (req, res) {
-  res.redirect(__dirname + '/login.html');
-});
+// app.get('/', function (req, res) {
+//   res.sendFile(__dirname + '/index.html');
+// });
 
-app.get('/script.js', function (req, res) {
-  res.sendFile(__dirname + '/script.js');
-});
+// app.post('/', function (req, res) {
+//   res.redirect(__dirname + '/login.html');
+// });
 
-app.get('/mainBG.png', function (req, res) {
-  res.sendFile(__dirname + '/mainBG.png');
-});
+// app.get('/script.js', function (req, res) {
+//   res.sendFile(__dirname + '/script.js');
+// });
+
+// app.get('/mainBG.png', function (req, res) {
+//   res.sendFile(__dirname + '/mainBG.png');
+// });
+
+// app.get('/login_style.css', function (req, res) {
+//   res.sendFile(__dirname + '/login_style.css');
+// });
 
 app.get('/style.css', function (req, res) {
   res.sendFile(__dirname + '/style.css');
@@ -39,24 +46,64 @@ app.get('/style.css', function (req, res) {
 // *******************************************************************
 
 io.on('connection', function (socket) {
-  // socket.on('test', function(data){
-  //   if(data == "go"){
-  //     app.redirect("./login.html");
-  //   }
-  //   if(passwords.length){
-  //     if(bcrypt.compareSync(data, passwords[0])) {
-  //       console.log("match")
-  //      } else {
-  //       console.log("NO match")
-  //      }  
-      
-  //     passwords.pop();
-  //   }
-  //   console.log(data);
-  //   let hash = bcrypt.hashSync(data, 10);
-  //   passwords.push(hash);
-  //   console.log(passwords);
+  socket.on("id-req", function(){
+    io.sockets.connected[socket.id].emit("id-resp", socket.id);
+  })
+
+  // socket.on("writejson", function () {
+  //   console.log("ok");
+    
+    
+  // });
+
+  // socket.on("jsonreq", function (data) {
+  //   fs.writeFileSync('test.json', data);
+
+  //   console.log("im going to read something")
+    
+  //   var obj;
+  //   fs.readFile('test.json', 'utf8', function (err, data) {
+  //     if (err) throw err;
+  //     obj = JSON.parse(data);
+  //     console.log(obj)
+  //   });
+    
   // })
+
+  // socket.on("read", function(){
+  //   var obj;
+  //   fs.readFile('test.json', 'utf8', function (err, data) {
+  //     if (err) throw err;
+  //     obj = JSON.parse(data);
+  //     console.log(obj)
+  //   });
+  // })
+
+  socket.on('done-login', function (data) {
+
+
+    // app.get('login.html', function (req, res) {
+    //   res.sendFile(__dirname + 'login.html');
+    // });
+
+
+    //   if(data == "go"){
+    //     app.redirect("./login.html");
+    //   }
+    //   if(passwords.length){
+    //     if(bcrypt.compareSync(data, passwords[0])) {
+    //       console.log("match")
+    //      } else {
+    //       console.log("NO match")
+    //      }  
+
+    //     passwords.pop();
+    //   }
+    //   console.log(data);
+    //   let hash = bcrypt.hashSync(data, 10);
+    //   passwords.push(hash);
+    //   console.log(passwords);
+  });
 
   io.sockets.connected[socket.id].emit("getN", lastClient);
   lastClient++;
@@ -114,16 +161,22 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('registration', function (reqName) {
+  socket.on('registration-login', function (reqName) {
 
     if (checkClients(reqName[0], clients)) {
       newName = reqName[0];
 
       if (!registeredClients[newName]) {
-        registeredClients[newName] = { "friendReq": {"inBox": [], "sended": []}, "id": socket.id, "friends": [] };
+        registeredClients[newName] = { "friendReq": { "inBox": [], "sended": [] }, "id": socket.id, "friends": [] };
       }
 
       clients[reqName[0]] = { "id": socket.id };
+
+      fs.readFile(__dirname + '\\chat_index.html', 'utf8', (err, dataPage) => {
+        if (err) throw err;
+  
+        io.sockets.connected[socket.id].emit('html-page', dataPage);
+      });
 
       // TODO indagare causa problema:
       //
@@ -132,7 +185,7 @@ io.on('connection', function (socket) {
       //                             ^
       // TypeError: Cannot set property 'name' of undefined
 
-      console.log("[INFO] " + getTime() + " account confirmed: " + reqName[0])
+      console.log("[INFO] " + getTime() + " account confirmed: " + reqName[0] + " obj: " + registeredClients[newName])
 
       io.sockets.connected[socket.id].emit("login", ["done", clients]); // messaggio mirato (id)
 
@@ -262,8 +315,8 @@ io.on('connection', function (socket) {
     }
   });
 
-  
-  socket.on('sign-out', function() {
+
+  socket.on('sign-out', function () {
     var arr = Object.keys(clients);
 
     Object.keys(clients).forEach(function (name) {
@@ -272,20 +325,20 @@ io.on('connection', function (socket) {
         delete clients[name];
       }
     });
-  
+
     lastClient--;
   });
 
   socket.on('disconnect', function () {
     var arr = Object.keys(clients);
-  
+
     Object.keys(clients).forEach(function (name) {
       if (clients[name]["id"] == socket.id) {
         console.log("[INFO] " + getTime() + " user disconnected " + name);
         delete clients[name];
       }
     });
-  
+
     lastClient--;
   });
 });

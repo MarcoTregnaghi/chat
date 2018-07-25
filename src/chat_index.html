@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="style.css" id = "firststyle">
+  <title>Ideas Hub</title>
+
+  
+</head>
+<body>
+  
+  <input id = "testHash">
+  <button id="sendpw">========</button>
+  <div class="container mt-3" id="testcont">
+    <ul class="nav nav-tabs" id="navBar">
+      <li class="nav-item">
+        <a class="nav-link active" id="chatBar" data-toggle="tab" href="#home">Chat</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" id="friendsBar" data-toggle="tab" href="#sectionFriends">Friends</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" id="searchReqBar" data-toggle="tab" href="#sectionSearchUsers">Search Users</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" id="friendsReqBar" data-toggle="tab" href="#sectionFriendRequest">Friend Request</a>
+      </li>
+      <div id="mainInput">
+        <input type="text" id="connectBtn">
+        <button type="button" class="btn btn-primary btn-sm" id="regBtn">connect</button>
+      </div>
+    </ul>
+    <button id="signOutBtn">Sign out</button>
+    <br>
+    <span>Logged as: </span>
+    <span id="loggedAs" style="color: red;"></span>
+    <div class="tab-content" id="aa">
+      <div id="sectionFriends" class="container tab-pane fade">
+        <div id="frndFluid" class="container-fluid">
+          <div class="row" id="mainFriends">
+            <div id="chatFriendsContainer">
+              <ul id="chatFriends">
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="home" class="container tab-pane active">
+        
+        <div class="flex-container" id="mainChat">
+          <div id="chatDiv">
+            <ul class="noListClass" id="chatList"></ul>
+          </div>
+          <div id="messagesDiv">
+            <ul class="noListClass" id="messages"></ul>
+          </div>
+        </div>
+        <div class="flex-container" id="mainSend">
+          <form id="formId" action="">
+            <input class="m" id="sendMessageBtn" autocomplete="off" />
+            <button type="submit" id="sendButton" class="btn btn-primary">Send</button>
+          </form>
+        </div>
+      </div>
+      <div id="sectionSearchUsers" class="container tab-pane fade">
+        <div id="reqFrndFluid" class="container-fluid">
+          <div class="row" id="mainFriendsReq">
+            <div id="frndInput">
+              <input type="text" id="userSearchField" onkeyup="searchFrnd()">
+              <button type="button" class="btn btn-primary btn-sm">Search for people online</button>
+            </div>
+            <div id="reqFriendsContainer">
+              <ul id="searchMatchUl">
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="sectionFriendRequest" class="container tab-pane fade">
+        <div id="reqFrndFluid" class="container-fluid">
+          <div id="reqFriendsContainer">
+            <br>
+            <ul class="frndReqUl" id="reqFriendsUl">
+            </ul>
+            <br>
+            <ul class="frndReqUl" id="reqFriendsSendedUl">
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
