@@ -14,7 +14,7 @@ var lastClient = 0;
 var clients = {}; //TODO cambiare in onlineclients
 var chats = {};
 var registeredClients = {};
-
+ 
 passwords = [];
 app.use(express.static('.\\'));
 //http.use('./',  app.static(__dirname + './'));
