@@ -1,6 +1,9 @@
-var socket = io();
+/**
+ * @author Marco Tregnaghi <tregnaghi.marco@gmail.com>
+ * 
+ */
 
-var foo= "foo"
+var socket = io();
 
 // socket.emit("id-req", 1)
 // socket.on("id-resp", function(data){console.log(data)});
@@ -23,9 +26,22 @@ $('#register-form-link').click(function (e) {
 $("#login-submit").on('click', function () {
 
     console.log("ok")
-    socket.emit('registration-login', [$("#login_username").val(), n]);
+    socket.emit('registration-login', [$("#login_username").val(), $("#login_password").val()]);
 
     //socket.emit('test', $("#testHash").val());
+
+});
+
+$("#register-submit").on('click', function () {
+
+    console.log("ok")
+    newUsername = $("#reg_username").val();
+    newPassword = $("#reg_password").val();
+    
+
+    socket.emit('registration', [newUsername, newPassword]);
+
+
 
 });
 
@@ -33,7 +49,6 @@ $("#testjson").click(function () {
 
     let student = {
         "id": {"1": "name"},
-
     };
 
     console.log("sended")
@@ -65,10 +80,18 @@ $("#readjson").click(function () {
     // console.log(parsed)
 });
 
-socket.on("jsonres", function (data) {
-        console.log(data);
-    });
+socket.on('error', function(code){
+    if(code == 111){
 
+        $("#register-submit").css('background-color', 'red');
+
+    }
+})
+
+socket.on("jsonres", function (data) {
+    
+    });
+var name;
 socket.on('login', function (msg) {
     if (msg[0] == "done") {
         name = $("#login_username").val();
@@ -80,11 +103,24 @@ socket.on('login', function (msg) {
 });
 
 socket.on('html-page', function (data) {
-    console.log("okk")
-    $("body").html(data)
+    $("body").html(data[0])
+
+    str=('<sc')
+    str+= 'ript>'+data[1]+'</scr'
+    str+='ipt>'
+    $("body").append(str)
+    str = "<styl"
+    str+="e>" + data[2] + "</st"
+    str+="yle>"
+
+
+
+    $("body").append(str)
     $("#firststyle").remove();
-    $("head").append("<link rel='stylesheet' type='text/css' href='style.css' id = 'style_file'>");
+//    $("head").append("<link rel='stylesheet' type='text/css' href='.\\chat_files\\style.css' id = 'style_file'>");
 });
+
+
 
 
 
