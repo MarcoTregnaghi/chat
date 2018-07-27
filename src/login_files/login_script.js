@@ -8,7 +8,20 @@ var socket = io();
 // socket.emit("id-req", 1)
 // socket.on("id-resp", function(data){console.log(data)});
 
+
+$(document).keypress(function (e) {
+    if (e.which == 13) {
+        if ($("#login-form-link")[0]["className"] == "active") {
+            $("#login-submit").click();
+        } else if ($("#register-form-link")[0]["className"] == "active") {
+            $("#register-submit").click();
+        }
+
+    }
+});
+
 $('#login-form-link').click(function (e) {
+    $("helpUserReg").hide();
     $("#login-form").delay(100).fadeIn(100);
     $("#register-form").fadeOut(100);
     $('#register-form-link').removeClass('active');
@@ -34,21 +47,63 @@ $("#login-submit").on('click', function () {
 
 $("#register-submit").on('click', function () {
 
-    console.log("ok")
+    function inputError(id) {
+        $("#helpUserReg").show();
+        $(id).css('border', '1px solid red')
+    }
+
     newUsername = $("#reg_username").val();
     newPassword = $("#reg_password").val();
-    
+    confirmPassword = $("#confirm-password").val();
 
-    socket.emit('registration', [newUsername, newPassword]);
+    var us_check_done = false;
+    var pw_check_done = false;
 
+    if ($("#reg_username").val() != "") { // Controllo stringa nuovo nome utente.
+        if (newUsername.length > 4 && newUsername.length < 15) {
+            if (/^[a-zA-Z0-9- ]*$/.test(newUsername) == true) {
+                us_check_done = true
 
+                $("#reg_username").css('border', '1px solid #ccc')
+            } else {
+                // Il nome contiene caratteri speciali.
+                inputError("#reg_username")
+            }
+        } else {
+            // Il nome è più lungo di 15 caratteri.
+            inputError("#reg_username")
+        }
+    } else {
+        // Il nome è vuoto.
+        inputError("#reg_username")
+    }
 
+    if (newPassword == confirmPassword) { // Controllo stringa nuova password utente.
+        if (newPassword.length > 6) {
+            pw_check_done = true;
+
+            $("#reg_password").css('border', '1px solid #ccc')
+            $("#confirm-password").css('border', '1px solid #ccc')
+        } else {
+            // La password è lunga meno di 6 caratteri.
+            inputError("#reg_password");
+            inputError("#confirm-password");
+        }
+    } else {
+        // Le password non corrispondono.
+        inputError("#reg_password");
+        inputError("#confirm-password");
+    }
+
+    if (pw_check_done && us_check_done) {
+        socket.emit('registration', [newUsername, newPassword]);
+    }
 });
 
 $("#testjson").click(function () {
 
     let student = {
-        "id": {"1": "name"},
+        "id": { "1": "name" },
     };
 
     console.log("sended")
@@ -58,10 +113,10 @@ $("#testjson").click(function () {
 });
 
 $("#testjso").click(function () {
-   
+
 
     let student = {
-        "id": {"1": "name"},
+        "id": { "1": "name" },
 
     };
 
@@ -80,8 +135,8 @@ $("#readjson").click(function () {
     // console.log(parsed)
 });
 
-socket.on('error', function(code){
-    if(code == 111){
+socket.on('error', function (code) {
+    if (code == 111) {
 
         $("#register-submit").css('background-color', 'red');
 
@@ -89,8 +144,8 @@ socket.on('error', function(code){
 })
 
 socket.on("jsonres", function (data) {
-    
-    });
+
+});
 var name;
 socket.on('login', function (msg) {
     if (msg[0] == "done") {
@@ -105,19 +160,19 @@ socket.on('login', function (msg) {
 socket.on('html-page', function (data) {
     $("body").html(data[0])
 
-    str=('<sc')
-    str+= 'ript>'+data[1]+'</scr'
-    str+='ipt>'
+    str = ('<sc')
+    str += 'ript>' + data[1] + '</scr'
+    str += 'ipt>'
     $("body").append(str)
     str = "<styl"
-    str+="e>" + data[2] + "</st"
-    str+="yle>"
+    str += "e>" + data[2] + "</st"
+    str += "yle>"
 
 
 
     $("body").append(str)
     $("#firststyle").remove();
-//    $("head").append("<link rel='stylesheet' type='text/css' href='.\\chat_files\\style.css' id = 'style_file'>");
+    //    $("head").append("<link rel='stylesheet' type='text/css' href='.\\chat_files\\style.css' id = 'style_file'>");
 });
 
 
