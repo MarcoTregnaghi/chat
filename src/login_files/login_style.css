@@ -2,6 +2,10 @@ body {
     padding-top: 90px;
 }
 
+#mainContainer {
+    width:70%;
+}
+
 #login_nav{
     left: 39%;
     padding-bottom: 15px;
@@ -26,6 +30,8 @@ body {
 }
 
 .panel-login>.panel-heading {
+    width: 105%;
+    position: relative;
     color: #00415d;
     background-color: #fff;
     border-color: #fff;

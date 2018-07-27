@@ -5,10 +5,6 @@
 
 var socket = io();
 
-// socket.emit("id-req", 1)
-// socket.on("id-resp", function(data){console.log(data)});
-
-
 $(document).keypress(function (e) {
     if (e.which == 13) {
         if ($("#login-form-link")[0]["className"] == "active") {
@@ -16,7 +12,6 @@ $(document).keypress(function (e) {
         } else if ($("#register-form-link")[0]["className"] == "active") {
             $("#register-submit").click();
         }
-
     }
 });
 
@@ -28,6 +23,7 @@ $('#login-form-link').click(function (e) {
     $(this).addClass('active');
     e.preventDefault();
 });
+
 $('#register-form-link').click(function (e) {
     $("#register-form").delay(100).fadeIn(100);
     $("#login-form").fadeOut(100);
@@ -37,12 +33,8 @@ $('#register-form-link').click(function (e) {
 });
 
 $("#login-submit").on('click', function () {
-
-    console.log("ok")
     socket.emit('registration-login', [$("#login_username").val(), $("#login_password").val()]);
-
     //socket.emit('test', $("#testHash").val());
-
 });
 
 $("#register-submit").on('click', function () {
@@ -59,8 +51,8 @@ $("#register-submit").on('click', function () {
     var us_check_done = false;
     var pw_check_done = false;
 
-    if ($("#reg_username").val() != "") { // Controllo stringa nuovo nome utente.
-        if (newUsername.length > 4 && newUsername.length < 15) {
+    if ($("#reg_username").val() != "" && $("#reg_username").val().includes(" ") == false) { // Controllo stringa nuovo nome utente.
+        if (newUsername.length > 2 && newUsername.length < 15) {
             if (/^[a-zA-Z0-9- ]*$/.test(newUsername) == true) {
                 us_check_done = true
 
@@ -74,7 +66,7 @@ $("#register-submit").on('click', function () {
             inputError("#reg_username")
         }
     } else {
-        // Il nome è vuoto.
+        // Il nome è vuoto o contiene spazi.
         inputError("#reg_username")
     }
 
@@ -97,6 +89,16 @@ $("#register-submit").on('click', function () {
 
     if (pw_check_done && us_check_done) {
         socket.emit('registration', [newUsername, newPassword]);
+
+        //$("helpUserReg").hide();
+        $("#login-form").delay(100).fadeIn(100);
+        $("#register-form").fadeOut(100);
+        $('#register-form-link').removeClass('active');
+        $("#login-form-link").addClass('active');
+        //e.preventDefault();
+
+        $("#login_username").val(newUsername);
+
     }
 });
 
